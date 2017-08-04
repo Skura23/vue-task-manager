@@ -13,7 +13,7 @@ Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app234',
+  el: '#app2',
   // router, 为es6语法, 表示router: router
   router,
   // 表示加载的模板 替换为<div>hello a</div>测试
