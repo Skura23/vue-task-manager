@@ -13,9 +13,13 @@ Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: '#app234',
   // router, 为es6语法, 表示router: router
   router,
-  template: '<App/>',
+  // 表示加载的模板 替换为<div>hello a</div>测试
+  // 标签名不区分大小写, APP也可以
+  template: '<app/>',
   components: { App }
 })
+
+// 最后, main.js被注入到index.html
