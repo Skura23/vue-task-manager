@@ -7,13 +7,13 @@
       <div class="l-side0 bo-r">
         <div class="cont-wra bo-b">
           <div class="menu" v-for="cate in taskManager">
-              <p :category="cate" @click="selectCate(cate)">{{cate.category}}</p>
-              <ul>
-                <li v-for="submenu in cate.submenu" @click="selectSub(submenu)">{{submenu.name}}</li>
-              </ul>
+            <p @click="selectCate(cate)">{{cate.category}}</p>
+            <ul>
+              <li v-for="submenu in cate.submenu" @click="selectSub(submenu, cate.submenu)">{{submenu.name}}</li>
+            </ul>
           </div>
         </div>
-        <div class="footer">新增分类</div>
+        <div class="footer" @click="addMenu">新增分类</div>
       </div>
       <div class="l-side1 bo-r">
         <div class="header bo-b">
@@ -25,36 +25,55 @@
           <div class="cont-inner">
             <template v-if="isCate">
               <template v-for="submenu in category.submenu">
-              <div class="day-wra" v-for="task in submenu.tasks">
-                <p>{{ task.date }}</p>
-                <ul>
-                  <li>{{ task.title }}</li>
-                </ul>
-              </div>
+                <div class="day-wra" v-for="task in submenu.tasks">
+                  <p>{{ task.date }}</p>
+                  <ul>
+                    <li @click="getTask(task)">{{ task.title }}</li>
+                  </ul>
+                </div>
               </template>
             </template>
             <template v-else>
               <div class="day-wra" v-for="task in tasks">
                 <p>{{ task.date }}</p>
                 <ul>
-                  <li>{{ task.title }}</li>
+                  <li @click="getTask(task)">{{ task.title }}</li>
                 </ul>
               </div>
             </template>
           </div>
         </div>
-        <div class="footer">新增任务</div>
+        <div class="footer" @click="subChosen && (showEditor = true)">新增任务</div>
       </div>
-      <div class="content">
+      <div class="content" v-show="!showEditor">
         <div class="header title bo-b">
-          <div>标题: </div>
+          <div>标题: {{showedTask.title}}</div>
           <div class="operate">
-            <span>标记完成</span>
-            <span>编辑</span>
+            <span @click="showedTask.done = true">标记完成</span>
+            <span @click="modiTask('edit')">编辑</span>
             <span>删除</span>
           </div>
         </div>
-        <div class="header date bo-b">日期: </div>
+        <div class="header date bo-b">日期: {{showedTask.date}}</div>
+        <div class="text-cont">{{showedTask.content}}</div>
+      </div>
+      <div class="content" v-show="showEditor" :class="{editor:showEditor}">
+        <div class="header title bo-b">
+          <div>标题:
+            <input type="text" ref="title" :value="isEditCmd ? showedTask.title : ''">
+          </div>
+        </div>
+        <div class="header date bo-b">日期:
+          <input type="text" ref="date" :value="isEditCmd ? showedTask.date : ''">
+        </div>
+        <div class="text-cont bo-b">
+          <span>正文:</span>
+          <textarea name="" id="" cols="30" rows="10" ref="content" :value="isEditCmd ? showedTask.content : ''"></textarea>
+        </div>
+        <div class="footer">
+          <span @click="confirmAdd">确定</span>
+          <span @click="cancelModi">取消</span>
+        </div>
       </div>
     </div>
   </div>
@@ -66,24 +85,87 @@ import axios from 'axios'
 export default {
   data() {
     return {
+      // 各级data数据
       taskManager: [],
+      submenu: [],
       submenus: [],
       tasks: [],
-      category: null,
+      showedTask: {},
+      // category: null,
       isCate: false,
+      // 是否选中的flag
+      menuChosen: false,
+      subChosen: false,
+      taskChosen: false,
+      isEditCmd: false,
+      // 是否显示编辑
+      showEditor: false,
       test: 'testa'
     }
   },
   methods: {
+    getTask(task) {
+      this.showedTask = task;
+      this.taskChosen = true;
+    },
+    // 增加, 编辑task
+    modiTask(type) {
+      // console.log(type)
+      if (this.taskChosen && type === 'edit') {
+        this.isEditCmd = true;
+        this.showEditor = true;
+      }
+    },
+    // 取消修改
+    cancelModi() {
+      var res = confirm('确定取消编辑么?');
+      if (res) {
+        this.showEditor = false;
+      }
+      this.isEditCmd = false;
+    },
+    // 修改task后询问
+    confirmAdd() {
+      var task = {};
+      // alert()
+      task.title = this.$refs.title.value.trim();
+      task.date = this.$refs.date.value.trim();
+      task.content = this.$refs.content.value.trim();
+      task.done = false;
+      console.log(task)
+      this.tasks.push(task)
+      // 重置editCmd
+      this.isEditCmd = false;
+    },
+    addMenu() {
+      var str = '';
+      if (!this.menuChosen) {
+        str = prompt('输入目录名称:').trim();
+        str && this.taskManager.push({ category: str })
+      } else {
+        if (this.isCate) {
+          str = prompt('输入目录名称:').trim();
+          str && this.taskManager.push({ category: str })
+        } else {
+          str = prompt('输入子目录名称:').trim();
+          str && this.subnames.push({ name: str })
+        }
+      }
+    },
     selectCate(cate) {
+      this.menuChosen = true;
+      this.subChosen = false;
       this.isCate = true;
       this.category = cate;
       // this.tasks = this.category.tasks;
       console.log(this.category)
     },
-    selectSub(submenu) {
+    selectSub(submenu, submenus) {
+      this.menuChosen = true;
+      this.subChosen = true;
       this.isCate = false;
       this.submenu = submenu;
+      this.submenus = submenus;
       this.tasks = this.submenu.tasks;
     },
     _test() {
@@ -91,7 +173,7 @@ export default {
     }
   },
   computed: {
-    _date() {}
+    _date() { }
   },
   created() {
     axios.get('static/data.json').then((res) => {
@@ -142,6 +224,7 @@ export default {
         line-height $hei
         text-indent $indent
         cursor pointer
+        background $bac
       .cont-wra
         flex 1
         height 0
@@ -188,7 +271,9 @@ export default {
           text-indent initial
           span
             cursor pointer
-
+      .text-cont
+        flex 1
+        padding 20px 0 0 15px
 .header
   flex 0 0 $hei
   line-height $hei
@@ -228,4 +313,32 @@ export default {
     padding-top 10px
 .selected
   background #fff!important
+
+.editor 
+  *
+    font-size 14px!important
+    font-weight normal!important
+  .text-cont span
+    vertical-align top
+    display inline-block
+  .footer
+    display flex
+    justify-content: space-around;
+    align-items center
+    span
+      height 30px
+      line-height @height
+      text-indent 0
+      padding 0 7px
+      &:hover
+        border-bottom 1px solid #535353
+  input
+    height 25px
+    margin-left 10px
+    padding-left 6px
+    border 1px solid rgb(169, 169, 169);
+  textarea
+    margin-left 10px
+    text-indent 5px
+    
 </style>

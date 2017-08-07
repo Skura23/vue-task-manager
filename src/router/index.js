@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import App from '../App'
 import TaskManager from '@/components/TaskManager/TaskManager'
 import Test from '@/components/test/test.vue'
 
@@ -9,11 +10,11 @@ Vue.use(Router)
 // 配置路由
 export default new Router({
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'App',
-    //   component: App
-    // },
+    {
+      path: '/',
+      name: 'TaskManager',
+      component: TaskManager
+    },
     {
       path: '/test',
       name: 'Test',
