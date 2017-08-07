@@ -6,10 +6,10 @@
     <div class="main">
       <div class="l-side0 bo-r">
         <div class="cont-wra bo-b">
-          <div class="menus" v-for="menu in tasks">
-              <p>{{menu.name}}</p>
+          <div class="menu" v-for="cate in taskManager">
+              <p :category="cate" @click="selectCate(cate)">{{cate.category}}</p>
               <ul>
-                <li>123</li>
+                <li v-for="submenu in cate.submenu" @click="selectSub(submenu)">{{submenu.name}}</li>
               </ul>
           </div>
         </div>
@@ -22,33 +22,39 @@
           <span>未完成</span>
         </div>
         <div class="cont-wra bo-b">
-          <div class="day-wra">
-            <p>2017-1-1</p>
-            <ul>
-              <li>test1</li>
-              <li>test2</li>
-            </ul>
-          </div>
-          <div class="day-wra">
-            <p>2017-1-1</p>
-            <ul>
-              <li>test3</li>
-              <li>test4</li>
-            </ul>
+          <div class="cont-inner">
+            <template v-if="isCate">
+              <template v-for="submenu in category.submenu">
+              <div class="day-wra" v-for="task in submenu.tasks">
+                <p>{{ task.date }}</p>
+                <ul>
+                  <li>{{ task.title }}</li>
+                </ul>
+              </div>
+              </template>
+            </template>
+            <template v-else>
+              <div class="day-wra" v-for="task in tasks">
+                <p>{{ task.date }}</p>
+                <ul>
+                  <li>{{ task.title }}</li>
+                </ul>
+              </div>
+            </template>
           </div>
         </div>
         <div class="footer">新增任务</div>
       </div>
       <div class="content">
         <div class="header title bo-b">
-          <div>标题</div>
+          <div>标题: </div>
           <div class="operate">
             <span>标记完成</span>
             <span>编辑</span>
             <span>删除</span>
           </div>
         </div>
-        <div class="header date bo-b">日期</div>
+        <div class="header date bo-b">日期: </div>
       </div>
     </div>
   </div>
@@ -60,13 +66,38 @@ import axios from 'axios'
 export default {
   data() {
     return {
-      tasks: []
+      taskManager: [],
+      submenus: [],
+      tasks: [],
+      category: null,
+      isCate: false,
+      test: 'testa'
     }
+  },
+  methods: {
+    selectCate(cate) {
+      this.isCate = true;
+      this.category = cate;
+      // this.tasks = this.category.tasks;
+      console.log(this.category)
+    },
+    selectSub(submenu) {
+      this.isCate = false;
+      this.submenu = submenu;
+      this.tasks = this.submenu.tasks;
+    },
+    _test() {
+      console.log(this.test)
+    }
+  },
+  computed: {
+    _date() {}
   },
   created() {
     axios.get('static/data.json').then((res) => {
-      console.log(res.data)
-      this.tasks = res.data.tasks
+      // this.tasks = res.data.tasks
+      this.taskManager = res.data.taskManager
+      console.log(this.taskManager)
     })
   }
 }
@@ -113,6 +144,8 @@ export default {
         cursor pointer
       .cont-wra
         flex 1
+        height 0
+        overflow-y auto
     // .tst1
     //   color red
     
@@ -136,7 +169,7 @@ export default {
       .cont-wra
         background #fff
         
-    
+        
     .content
       flex 1
       min-width 500px
@@ -162,7 +195,7 @@ export default {
   background $bac
   text-indent $indent
 
-.day-wra
+.main .day-wra
   p
     height 30px
     line-height @height
@@ -181,9 +214,18 @@ export default {
 .l-side0
   flex 0 0 250px
   background $bac
-  li
-    @extend .day-wra li
-  p
-    @extend .day-wra p
-
+  .menu
+    li
+      @extend .main .day-wra li
+      padding-left 20px
+    p
+      @extend .main .day-wra p
+      font-style normal
+      background $bac
+      border-bottom 0
+      cursor pointer
+  .cont-wra
+    padding-top 10px
+.selected
+  background #fff!important
 </style>

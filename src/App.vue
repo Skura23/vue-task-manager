@@ -2,7 +2,6 @@
   <!-- 这里的类名用于style,外部无法获取 -->
   <div id="app">
     <Task-Manager></Task-Manager>
-    <router-view></router-view>
   </div>
 </template>
 
