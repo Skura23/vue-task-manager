@@ -7,13 +7,16 @@
       <div class="l-side0 bo-r">
         <div class="cont-wra bo-b">
           <div class="menu" v-for="cate in taskManager">
-            <p @click="selectCate(cate)">{{cate.category}}</p>
+            <p @click.stop="selectCate(cate)">{{cate.category}}</p>
             <ul>
-              <li v-for="submenu in cate.submenu" @click="selectSub(submenu, cate.submenu)">{{submenu.name}}</li>
+              <li v-for="submenu in cate.submenu" @click.stop="selectSub(submenu, cate.submenu)">{{submenu.name}}</li>
             </ul>
           </div>
         </div>
-        <div class="footer" @click="addMenu">新增分类</div>
+        <div class="footer">
+          <div class="bo-r" @click="addMenu">新增分类</div>
+          <div @click="addSubmenu">新增子分类</div>
+        </div>
       </div>
       <div class="l-side1 bo-r">
         <div class="header bo-b">
@@ -43,7 +46,7 @@
             </template>
           </div>
         </div>
-        <div class="footer" @click="subChosen && (showEditor = true)">新增任务</div>
+        <div class="footer" @click="modiTask('add')">新增任务</div>
       </div>
       <div class="content" v-show="!showEditor">
         <div class="header title bo-b">
@@ -112,9 +115,22 @@ export default {
     // 增加, 编辑task
     modiTask(type) {
       // console.log(type)
-      if (this.taskChosen && type === 'edit') {
-        this.isEditCmd = true;
-        this.showEditor = true;
+      if (type === 'edit') {
+        if (this.taskChosen) {
+          this.isEditCmd = true;
+          this.showEditor = true;
+        } else {
+          alert('未选中任务');
+          return false;
+        }
+      }
+      if (type === 'add') {
+        if (this.subChosen) {
+          this.showEditor = true
+        } else {
+          alert('未选中子目录');
+          return false;
+        }
       }
     },
     // 取消修改
@@ -133,8 +149,12 @@ export default {
       task.date = this.$refs.date.value.trim();
       task.content = this.$refs.content.value.trim();
       task.done = false;
-      console.log(task)
-      this.tasks.push(task)
+      // console.log(task)
+      if (this.isEditCmd) {
+        this.showedTask = task;
+      } else {
+        this.tasks.push(task)
+      }
       // 重置editCmd
       this.isEditCmd = false;
     },
@@ -149,8 +169,18 @@ export default {
           str && this.taskManager.push({ category: str })
         } else {
           str = prompt('输入子目录名称:').trim();
-          str && this.subnames.push({ name: str })
+          str && this.submenus.push({ name: str })
         }
+      }
+    },
+    addSubmenu() {
+      var str = '';
+      if (!this.menuChosen) {
+        alert('请先选择目录或子目录');
+        return false;
+      } else {
+        str = prompt('输入子目录名称:').trim();
+        str && this.submenus.push({ name: str })
       }
     },
     selectCate(cate) {
@@ -158,6 +188,7 @@ export default {
       this.subChosen = false;
       this.isCate = true;
       this.category = cate;
+      this.submenus = cate.submenu;
       // this.tasks = this.category.tasks;
       console.log(this.category)
     },
@@ -312,6 +343,11 @@ export default {
       cursor pointer
   .cont-wra
     padding-top 10px
+  .footer
+    display flex
+    div
+      flex: 1 1 0
+      
 .selected
   background #fff!important
 
