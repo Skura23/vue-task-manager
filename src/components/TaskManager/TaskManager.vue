@@ -86,6 +86,7 @@ export default {
   data() {
     return {
       // 各级data数据
+      category: [],
       taskManager: [],
       submenu: [],
       submenus: [],
