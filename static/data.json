@@ -5,25 +5,25 @@
           "name": "vue相关",
           "tasks": [{
               "title": "task manager项目",
-              "date": 1501927910,
+              "date": 2016,
               "content": "学习vue并完成task manager项目",
               "done": false
             },
             {
               "title": "img manager项目",
-              "date": 1501927930,
+              "date": 2016,
               "content": "img manager小demo",
               "done": false
             },
             {
               "title": "foo项目",
-              "date": 1508888000,
+              "date": 2017,
               "content": "foo",
               "done": false
             },
             {
               "title": "bar项目",
-              "date": 1508880000,
+              "date": 2017,
               "content": "foo",
               "done": false
             }

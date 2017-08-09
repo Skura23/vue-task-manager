@@ -28,19 +28,19 @@
           <div class="cont-inner">
             <template v-if="isCate">
               <template v-for="submenu in category.submenu">
-                <div class="day-wra" v-for="task in submenu.tasks">
+                <div class="day-wra" v-for="(task, $index) in submenu.tasks">
                   <p>{{ task.date }}</p>
                   <ul>
-                    <li @click="getTask(task)">{{ task.title }}</li>
+                    <li @click="getTask(task, $index)">{{ task.title }}</li>
                   </ul>
                 </div>
               </template>
             </template>
             <template v-else>
-              <div class="day-wra" v-for="task in tasks">
+              <div class="day-wra" v-for="(task, $index) in tasks">
                 <p>{{ task.date }}</p>
                 <ul>
-                  <li @click="getTask(task)">{{ task.title }}</li>
+                  <li @click="getTask(task, $index)">{{ task.title }}</li>
                 </ul>
               </div>
             </template>
@@ -74,7 +74,7 @@
           <textarea name="" id="" cols="30" rows="10" ref="content" :value="isEditCmd ? showedTask.content : ''"></textarea>
         </div>
         <div class="footer">
-          <span @click="confirmAdd">确定</span>
+          <span @click="confirmModi">确定</span>
           <span @click="cancelModi">取消</span>
         </div>
       </div>
@@ -104,12 +104,18 @@ export default {
       isEditCmd: false,
       // 是否显示编辑
       showEditor: false,
-      test: 'testa'
+      test: 'testa',
+      taskIndex: null
     }
   },
   methods: {
-    getTask(task) {
+    getTask(task, index) {
+      if (this.showEditor) {
+        return false
+      }
       this.showedTask = task;
+      console.log(task)
+      this.taskIndex = index;
       this.taskChosen = true;
     },
     // 增加, 编辑task
@@ -138,40 +144,36 @@ export default {
       var res = confirm('确定取消编辑么?');
       if (res) {
         this.showEditor = false;
+        this.isEditCmd = false;
       }
-      this.isEditCmd = false;
+      // this.isEditCmd = false;
     },
     // 修改task后询问
-    confirmAdd() {
+    confirmModi() {
       var task = {};
       // alert()
       task.title = this.$refs.title.value.trim();
-      task.date = this.$refs.date.value.trim();
+      task.time = Date.now();
+      task.date = this.getFormattedDate()
+      // task.date = this.$refs.date.value.trim();
       task.content = this.$refs.content.value.trim();
       task.done = false;
       // console.log(task)
       if (this.isEditCmd) {
+        // this.taskIndex
+        this.tasks[this.taskIndex] = task;
         this.showedTask = task;
       } else {
         this.tasks.push(task)
       }
+      this.showEditor = false;
       // 重置editCmd
       this.isEditCmd = false;
     },
     addMenu() {
       var str = '';
-      if (!this.menuChosen) {
-        str = prompt('输入目录名称:').trim();
-        str && this.taskManager.push({ category: str })
-      } else {
-        if (this.isCate) {
-          str = prompt('输入目录名称:').trim();
-          str && this.taskManager.push({ category: str })
-        } else {
-          str = prompt('输入子目录名称:').trim();
-          str && this.submenus.push({ name: str })
-        }
-      }
+      str = prompt('输入目录名称:').trim();
+      str && this.taskManager.push({ category: str })
     },
     addSubmenu() {
       var str = '';
@@ -184,6 +186,9 @@ export default {
       }
     },
     selectCate(cate) {
+      if (this.showEditor) {
+        return false
+      }
       this.menuChosen = true;
       this.subChosen = false;
       this.isCate = true;
@@ -193,27 +198,50 @@ export default {
       console.log(this.category)
     },
     selectSub(submenu, submenus) {
+      if (this.showEditor) {
+        return false
+      }
       this.menuChosen = true;
       this.subChosen = true;
       this.isCate = false;
       this.submenu = submenu;
       this.submenus = submenus;
       this.tasks = this.submenu.tasks;
+      this.arrangeTasksByDate()
+    },
+    arrangeTasksByDate() {
+      console.log(this.tasks);
     },
     _test() {
       console.log(this.test)
+    },
+    getFormattedDate() {
+      var date = new Date();
+      var month = date.getMonth() + 1;
+      var day = date.getDate();
+      var hour = date.getHours();
+      var min = date.getMinutes();
+      var sec = date.getSeconds();
+      month = (month < 10 ? '0' : '') + month;
+      day = (day < 10 ? '0' : '') + day;
+      hour = (hour < 10 ? '0' : '') + hour;
+      min = (min < 10 ? '0' : '') + min;
+      sec = (sec < 10 ? '0' : '') + sec;
+      var str = date.getFullYear() + '-' + month + '-' + day + '_' + hour + ':' + min + ':' + sec;
+      /* alert(str); */
+      return str;
     }
   },
-  computed: {
-    _date() { }
-  },
-  created() {
-    axios.get('static/data.json').then((res) => {
-      // this.tasks = res.data.tasks
-      this.taskManager = res.data.taskManager
-      console.log(this.taskManager)
-    })
-  }
+computed: {
+  _date() { }
+},
+created() {
+  axios.get('static/data.json').then((res) => {
+    // this.tasks = res.data.tasks
+    this.taskManager = res.data.taskManager
+    console.log(this.taskManager)
+  })
+}
 }
 </script>
 
