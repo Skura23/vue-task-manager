@@ -20,27 +20,29 @@
       </div>
       <div class="l-side1 bo-r">
         <div class="header bo-b">
-          <span class="on">所有</span>
-          <span>已完成</span>
-          <span>未完成</span>
+          <span :class="{on:doneType == 'all'}" @click="chooseDoneType('all')">所有</span>
+          <span :class="{on:doneType == 'done'}" @click="chooseDoneType('done')">已完成</span>
+          <span :class="{on:doneType == 'undone'}" @click="chooseDoneType('undone')">未完成</span>
         </div>
         <div class="cont-wra bo-b">
           <div class="cont-inner">
             <template v-if="isCate">
               <template v-for="submenu in category.submenu">
                 <div class="day-wra" v-for="(task, $index) in submenu.tasks">
-                  <p>{{ task.date }}</p>
+                  <!-- 很关键, 这句话控制重复日期栏不显示 -->
+                  <p v-if="$index==0 || (task.date != submenu.tasks[$index-1].date)">{{ task.date }}</p>
                   <ul>
-                    <li @click="getTask(task, $index)">{{ task.title }}</li>
+                    <!-- 通过多元判断操作符实现复杂逻辑判断 -->
+                    <li v-show="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" :class="{done: task.done}" @click="getTask(task, $index)">{{ task.title }}</li>
                   </ul>
                 </div>
               </template>
             </template>
             <template v-else>
               <div class="day-wra" v-for="(task, $index) in tasks">
-                <p>{{ task.date }}</p>
+                <p v-if="$index==0 || (task.date != tasks[$index-1].date)">{{ task.date }}</p>
                 <ul>
-                  <li @click="getTask(task, $index)">{{ task.title }}</li>
+                  <li v-show="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" :class="{done: task.done}" @click="getTask(task, $index)">{{ task.title }}</li>
                 </ul>
               </div>
             </template>
@@ -105,7 +107,9 @@ export default {
       // 是否显示编辑
       showEditor: false,
       test: 'testa',
-      taskIndex: null
+      taskIndex: null,
+      doneType: 'all',
+      itemShowed: null
     }
   },
   methods: {
@@ -207,12 +211,20 @@ export default {
       this.submenu = submenu;
       this.submenus = submenus;
       this.tasks = this.submenu.tasks;
-      this.arrangeTasksByDate()
     },
-    arrangeTasksByDate() {
-      console.log(this.tasks);
-      var tasks = this.tasks;
+    chooseDoneType(type) {
+      this.doneType = type
     },
+    // listShowController(type, task) {
+    //   // task.done && (doneType == ('all' || 'done'))
+    //   if (type === 'all') {
+    //     return true;
+    //   } else if (type === 'done' && task.done) {
+    //     return true;
+    //   } else if (type === 'undone' && !task.done) {
+    //     return true
+    //   }
+    // },
     _test() {
       console.log(this.test)
     },
@@ -233,16 +245,16 @@ export default {
       return str;
     }
   },
-computed: {
-  _date() { }
-},
-created() {
-  axios.get('static/data.json').then((res) => {
-    // this.tasks = res.data.tasks
-    this.taskManager = res.data.taskManager
-    console.log(this.taskManager)
-  })
-}
+  computed: {
+    _date() { }
+  },
+  created() {
+    axios.get('static/data.json').then((res) => {
+      // this.tasks = res.data.tasks
+      this.taskManager = res.data.taskManager
+      console.log(this.taskManager)
+    })
+  }
 }
 </script>
 
@@ -406,5 +418,7 @@ created() {
   textarea
     margin-left 10px
     text-indent 5px
-    
+.done
+  color #20c120
+  font-weight bold
 </style>
