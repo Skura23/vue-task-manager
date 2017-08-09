@@ -211,6 +211,7 @@ export default {
     },
     arrangeTasksByDate() {
       console.log(this.tasks);
+      var tasks = this.tasks;
     },
     _test() {
       console.log(this.test)
