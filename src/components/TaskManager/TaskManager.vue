@@ -28,7 +28,9 @@
           <div class="cont-inner">
             <template v-if="isCate">
               <template v-for="submenu in category.submenu">
-                <div class="day-wra" v-for="(task, $index) in submenu.tasks">
+                <!-- 这个v-if和下面else里的v-if作用都是控制日期栏的显示, 没有这句话的话
+                即使任务为空日期栏仍会显示, 印象用户体验 -->
+                <div class="day-wra" v-for="(task, $index) in submenu.tasks" v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)">
                   <!-- 很关键, 这句话控制重复日期栏不显示 -->
                   <p v-if="$index==0 || (task.date != submenu.tasks[$index-1].date)">{{ task.date }}</p>
                   <ul>
@@ -39,7 +41,7 @@
               </template>
             </template>
             <template v-else>
-              <div class="day-wra" v-for="(task, $index) in tasks">
+              <div class="day-wra" v-for="(task, $index) in tasks" v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)">
                 <p v-if="$index==0 || (task.date != tasks[$index-1].date)">{{ task.date }}</p>
                 <ul>
                   <li v-show="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" :class="{done: task.done}" @click="getTask(task, $index)">{{ task.title }}</li>
@@ -177,7 +179,7 @@ export default {
     addMenu() {
       var str = '';
       str = prompt('输入目录名称:').trim();
-      str && this.taskManager.push({ category: str })
+      str && this.taskManager.push({ category: str, submenu: [] })
     },
     addSubmenu() {
       var str = '';
@@ -186,7 +188,7 @@ export default {
         return false;
       } else {
         str = prompt('输入子目录名称:').trim();
-        str && this.submenus.push({ name: str })
+        str && this.submenus.push({ name: str, tasks: [] })
       }
     },
     selectCate(cate) {
