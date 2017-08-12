@@ -5,25 +5,25 @@
           "name": "vue相关",
           "tasks": [{
               "title": "task manager项目",
-              "date": 2016,
+              "date": "2017-4-5",
               "content": "学习vue并完成task manager项目",
               "done": false
             },
             {
               "title": "img manager项目",
-              "date": 2016,
+              "date": "2017-4-5",
               "content": "img manager小demo",
               "done": false
             },
             {
               "title": "foo项目",
-              "date": 2017,
+              "date": "2017-4-7",
               "content": "foo",
               "done": false
             },
             {
               "title": "bar项目",
-              "date": 2017,
+              "date": "2017-4-7",
               "content": "foo",
               "done": false
             }
@@ -33,7 +33,7 @@
           "name": "node.js相关",
           "tasks": [{
             "title": "node.js项目",
-            "date": 1501927980,
+            "date": "1501927980",
             "content": "学习node并完成node.js项目",
             "done": false
           }]
@@ -46,13 +46,13 @@
         "name": "后台页面",
         "tasks": [{
             "title": "admin页面修改",
-            "date": 1501927900,
+            "date": "1501927900",
             "content": "admin页面修改",
             "done": false
           },
           {
             "title": "学院中心页面",
-            "date": 1501927830,
+            "date": "1501927830",
             "content": "页面样式修改",
             "done": false
           }

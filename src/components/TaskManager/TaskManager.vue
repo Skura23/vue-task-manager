@@ -26,31 +26,19 @@
         </div>
         <div class="cont-wra bo-b">
           <div class="cont-inner">
-            <template v-if="isCate">
-              <template v-for="submenu in category.submenu">
-                <!-- 这个v-if和下面else里的v-if作用都是控制日期栏的显示, 没有这句话的话
+              <!-- 这个v-if和下面else里的v-if作用都是控制日期栏的显示, 没有这句话的话
                 即使任务为空日期栏仍会显示, 印象用户体验 -->
 
-                <!-- v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" -->
-                <div class="day-wra" v-for="(task, $index) in submenu.tasks" >
-                  <!-- 很关键, 这句话控制重复日期栏不显示 -->
-                  <!-- v-if="$index==0 || (task.date != submenu.tasks[$index-1].date)" -->
-                  <p>{{ task.date }}</p>
-                  <ul>
-                    <!-- 通过多元判断操作符实现复杂逻辑判断 -->
-                    <li :class="{done: task.done}" @click="getTask(task, $index)">{{ task.title }}</li>
-                  </ul>
-                </div>
-              </template>
-            </template>
-            <template v-else>
-              <div class="day-wra" v-for="(task, $index) in tasks">
-                <p>{{ task.date }}</p>
+              <!-- v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" -->
+              <div class="day-wra" v-for="(tasks, date, $index) in sortedTasks">
+                <!-- 很关键, 这句话控制重复日期栏不显示 -->
+                <!-- v-if="$index==0 || (task.date != submenu.tasks[$index-1].date)" -->
+               <p>{{ date }}</p>
                 <ul>
-                  <li :class="{done: task.done}" @click="getTask(task, $index)">{{ task.title }}</li>
+                  <li :class="{done: task.done}" @click="getTask(task, $index)" v-for=" task in tasks">{{ task.title }}</li>
                 </ul>
               </div>
-            </template>
+            
           </div>
         </div>
         <div class="footer" @click="modiTask('add')">新增任务</div>
@@ -123,7 +111,7 @@ export default {
         return false
       }
       this.showedTask = task;
-      console.log(task)
+      // console.log(task)
       this.taskIndex = index;
       this.taskChosen = true;
     },
@@ -203,8 +191,15 @@ export default {
       this.isCate = true;
       this.category = cate;
       this.submenus = cate.submenu;
-      // this.tasks = this.category.tasks;
-      console.log(this.category)
+      // 将各sub下各task连接到一个数组
+      var tasks = []
+      for (var i = 0; i < this.submenus.length; i++) {
+        var sub = this.submenus[i];
+        tasks = tasks.concat(sub.tasks)
+      }
+      this.tasks = tasks;
+      console.log(this.tasks)
+      // console.log(this.category)
     },
     selectSub(submenu, submenus) {
       if (this.showEditor) {
@@ -216,6 +211,8 @@ export default {
       this.submenu = submenu;
       this.submenus = submenus;
       this.tasks = this.submenu.tasks;
+      console.log(this.tasks)
+      console.log(this.sortedTasks)
     },
     chooseDoneType(type) {
       this.doneType = type
@@ -248,10 +245,45 @@ export default {
       var str = date.getFullYear() + '-' + month + '-' + day + '_' + hour + ':' + min + ':' + sec;
       /* alert(str); */
       return str;
+    },
+    // 数组去重函数
+    eliminateDuplicates(arr) {
+      var i;
+      var len = arr.length;
+      var out = [];
+      var obj = {};
+      for (i = 0; i < len; i++) {
+        obj[arr[i]] = 0;
+      }
+      for (i in obj) {
+        out.push(i);
+      }
+      return out;
     }
   },
   computed: {
-    _date() { }
+    _date() { },
+    sortedTasks() {
+      var dateArr = [];
+      for (var i = 0; i < this.tasks.length; i++) {
+        var task = this.tasks[i];
+        dateArr.push(task.date)
+      }
+      dateArr = this.eliminateDuplicates(dateArr)
+      var dateObj = {};
+      for (var t = 0; t < dateArr.length; t++) {
+        var date = dateArr[t];
+        var arr = dateObj[date] = [];
+        for (var p = 0; p < this.tasks.length; p++) {
+          var _task = this.tasks[p];
+          if (_task.date === date) {
+            arr.push(_task)
+          }
+        }
+      }
+      console.log(dateObj)
+      return dateObj
+    }
   },
   created() {
     axios.get('static/data.json').then((res) => {
