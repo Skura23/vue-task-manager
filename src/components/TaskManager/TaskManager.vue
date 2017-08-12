@@ -30,21 +30,24 @@
               <template v-for="submenu in category.submenu">
                 <!-- 这个v-if和下面else里的v-if作用都是控制日期栏的显示, 没有这句话的话
                 即使任务为空日期栏仍会显示, 印象用户体验 -->
-                <div class="day-wra" v-for="(task, $index) in submenu.tasks" v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)">
+
+                <!-- v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" -->
+                <div class="day-wra" v-for="(task, $index) in submenu.tasks" >
                   <!-- 很关键, 这句话控制重复日期栏不显示 -->
-                  <p v-if="$index==0 || (task.date != submenu.tasks[$index-1].date)">{{ task.date }}</p>
+                  <!-- v-if="$index==0 || (task.date != submenu.tasks[$index-1].date)" -->
+                  <p>{{ task.date }}</p>
                   <ul>
                     <!-- 通过多元判断操作符实现复杂逻辑判断 -->
-                    <li v-show="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" :class="{done: task.done}" @click="getTask(task, $index)">{{ task.title }}</li>
+                    <li :class="{done: task.done}" @click="getTask(task, $index)">{{ task.title }}</li>
                   </ul>
                 </div>
               </template>
             </template>
             <template v-else>
-              <div class="day-wra" v-for="(task, $index) in tasks" v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)">
-                <p v-if="$index==0 || (task.date != tasks[$index-1].date)">{{ task.date }}</p>
+              <div class="day-wra" v-for="(task, $index) in tasks">
+                <p>{{ task.date }}</p>
                 <ul>
-                  <li v-show="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" :class="{done: task.done}" @click="getTask(task, $index)">{{ task.title }}</li>
+                  <li :class="{done: task.done}" @click="getTask(task, $index)">{{ task.title }}</li>
                 </ul>
               </div>
             </template>
@@ -92,7 +95,7 @@ import axios from 'axios'
 export default {
   data() {
     return {
-      // 各级data数据
+      // 各级data数据容器
       category: [],
       taskManager: [],
       submenu: [],
