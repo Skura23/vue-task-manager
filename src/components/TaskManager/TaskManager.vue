@@ -26,19 +26,19 @@
         </div>
         <div class="cont-wra bo-b">
           <div class="cont-inner">
-              <!-- 这个v-if和下面else里的v-if作用都是控制日期栏的显示, 没有这句话的话
-                即使任务为空日期栏仍会显示, 印象用户体验 -->
-
-              <!-- v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" -->
-              <div class="day-wra" v-for="(tasks, date, $index) in sortedTasks">
-                <!-- 很关键, 这句话控制重复日期栏不显示 -->
-                <!-- v-if="$index==0 || (task.date != submenu.tasks[$index-1].date)" -->
-               <p>{{ date }}</p>
-                <ul>
-                  <li :class="{done: task.done}" @click="getTask(task, $index)" v-for=" task in tasks">{{ task.title }}</li>
-                </ul>
-              </div>
-            
+            <!-- 这个v-if和下面else里的v-if作用都是控制日期栏的显示, 没有这句话的话
+                          即使任务为空日期栏仍会显示, 印象用户体验 -->
+  
+            <!-- v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" -->
+            <div class="day-wra" v-for="(tasks, date, $index) in sortedTasks">
+              <!-- 很关键, 这句话控制重复日期栏不显示 -->
+              <!-- v-if="$index==0 || (task.date != submenu.tasks[$index-1].date)" -->
+              <p v-if="getRenderedLen">{{ date }}</p>
+              <ul>
+                <li :class="{done: task.done}" @click="getTask(task, $index)" v-for=" task in tasks" v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)">{{ task.title }}</li>
+              </ul>
+            </div>
+  
           </div>
         </div>
         <div class="footer" @click="modiTask('add')">新增任务</div>
@@ -216,6 +216,26 @@ export default {
     },
     chooseDoneType(type) {
       this.doneType = type
+      // var tasks = [];
+      // tasks = JSON.parse(JSON.stringify(this.tasks));
+      // if (type === 'done') {
+      //   // 逆向循环解决.splice(i, 1)重新排序的问题
+      //   for (var i = tasks.length - 1; i >= 0; i--) {
+      //     var task = tasks[i];
+      //     if (!task.done) {
+      //       tasks.splice(i, 1)
+      //     }
+      //   }
+      // } else if (type === 'undone') {
+      //   for (var t = tasks.length - 1; t >= 0; t--) {
+      //     var _task = tasks[t];
+      //     if (_task.done) {
+      //       tasks.splice(t, 1)
+      //     }
+      //   }
+      // } else {}
+      // this.tasks = tasks;
+      // console.log(tasks)
     },
     // listShowController(type, task) {
     //   // task.done && (doneType == ('all' || 'done'))
@@ -283,6 +303,31 @@ export default {
       }
       console.log(dateObj)
       return dateObj
+    },
+    getRenderedLen() {
+      var value = this.tasks
+      var type = this.doneType
+      var zeroLen = false;
+      var arr = [];
+      for (var i = 0; i < value.length; i++) {
+        var task = value[i];
+        if (type === 'done') {
+          if (task.done) {
+            arr.push[task]
+          }
+        } else if (type === 'undone') {
+          if (!task.done) {
+            arr.push[task]
+          }
+        }
+      }
+      if (arr.length === 0) {
+        zeroLen = true;
+      }
+      if (type === 'all') {
+        zeroLen = false;
+      }
+      return zeroLen
     }
   },
   created() {
