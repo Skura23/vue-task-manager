@@ -8,13 +8,13 @@
 <script>
 // 插入各组件 (step 0)
 import TaskManager from '@/components/TaskManager/TaskManager';
-import Test from '@/components/test/test';
+// import Test from '@/components/test/test';
 import axios from 'axios';
 
 export default {
   name: 'app',
   components: {
-    Test,
+    // Test,
     TaskManager
   }
 }

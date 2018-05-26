@@ -182,6 +182,7 @@ export default {
         str && this.submenus.push({ name: str, tasks: [] })
       }
     },
+    // 点选大目录
     selectCate(cate) {
       if (this.showEditor) {
         return false
@@ -198,9 +199,8 @@ export default {
         tasks = tasks.concat(sub.tasks)
       }
       this.tasks = tasks;
-      console.log(this.tasks)
-      // console.log(this.category)
     },
+    // 点选子目录
     selectSub(submenu, submenus) {
       if (this.showEditor) {
         return false
@@ -264,6 +264,7 @@ export default {
       sec = (sec < 10 ? '0' : '') + sec;
       var str = date.getFullYear() + '-' + month + '-' + day + '_' + hour + ':' + min + ':' + sec;
       /* alert(str); */
+      // 格式: 2018-05-26_14:22:05
       return str;
     },
     // 数组去重函数
