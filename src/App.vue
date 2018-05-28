@@ -10,6 +10,8 @@
 import TaskManager from '@/components/TaskManager/TaskManager';
 // import Test from '@/components/test/test';
 import axios from 'axios';
+// import jQuery from 'jQuery';
+// window.jQuery = jQuery
 
 export default {
   name: 'app',

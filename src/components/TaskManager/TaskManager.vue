@@ -7,9 +7,9 @@
       <div class="l-side0 bo-r">
         <div class="cont-wra bo-b">
           <div class="menu" v-for="cate in taskManager">
-            <p @click.stop="selectCate(cate)">{{cate.category}}</p>
+            <p @click.stop="selectCate($event, cate)" class="menu">{{cate.category}}</p>
             <ul>
-              <li v-for="submenu in cate.submenu" @click.stop="selectSub(submenu, cate.submenu)">{{submenu.name}}</li>
+              <li v-for="submenu in cate.submenu" @click.stop="selectSub($event, submenu, cate.submenu)" class="menu">{{submenu.name}}</li>
             </ul>
           </div>
         </div>
@@ -79,6 +79,7 @@
 
 <script type='text/babel'>
 import axios from 'axios'
+import jquery from 'jquery'
 
 export default {
   data() {
@@ -91,6 +92,7 @@ export default {
       tasks: [],
       showedTask: {},
       // category: null,
+      // 判断点选的是主目录还是子目录flag
       isCate: false,
       // 是否选中的flag
       menuChosen: false,
@@ -183,7 +185,8 @@ export default {
       }
     },
     // 点选大目录
-    selectCate(cate) {
+    selectCate($event, cate) {
+      this.menuChosenStyHandler($event.currentTarget)
       if (this.showEditor) {
         return false
       }
@@ -201,7 +204,8 @@ export default {
       this.tasks = tasks;
     },
     // 点选子目录
-    selectSub(submenu, submenus) {
+    selectSub($event, submenu, submenus) {
+      this.menuChosenStyHandler($event.currentTarget)
       if (this.showEditor) {
         return false
       }
@@ -211,8 +215,8 @@ export default {
       this.submenu = submenu;
       this.submenus = submenus;
       this.tasks = this.submenu.tasks;
-      console.log(this.tasks)
-      console.log(this.sortedTasks)
+      // console.log(this.tasks)
+      // console.log(this.sortedTasks)
     },
     chooseDoneType(type) {
       this.doneType = type
@@ -249,6 +253,13 @@ export default {
     // },
     _test() {
       console.log(this.test)
+    },
+    // dom 操作
+    // 菜单点击选中样式处理
+    menuChosenStyHandler(elem){
+      var cls = elem.classList[0]
+      $('.l-side0').find('.'+cls).removeClass('on')
+      $(elem).addClass('on')
     },
     getFormattedDate() {
       var date = new Date();

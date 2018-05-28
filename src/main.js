@@ -8,7 +8,8 @@ import Vue from 'vue'
 import App from './App'
 // 获取路由器
 import router from './router'
-
+import jQuery from 'jQuery'
+window.jQuery = jQuery
 import './assets/stylus/index.styl';
 Vue.config.productionTip = false
 /* eslint-disable no-new */
