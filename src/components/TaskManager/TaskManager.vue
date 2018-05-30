@@ -6,10 +6,10 @@
     <div class="main">
       <div class="l-side0 bo-r">
         <div class="cont-wra bo-b">
-          <div class="menu" v-for="cate in taskManager">
-            <p @click.stop="selectCate($event, cate)" class="menu">{{cate.category}}</p>
+          <div class="menu " v-for="cate in taskManager">
+            <p @click.stop="selectCate($event, cate)" class="_menu">{{cate.category}}</p>
             <ul>
-              <li v-for="submenu in cate.submenu" @click.stop="selectSub($event, submenu, cate.submenu)" class="menu">{{submenu.name}}</li>
+              <li v-for="submenu in cate.submenu" @click.stop="selectSub($event, submenu, cate.submenu)" class="_menu">{{submenu.name}}</li>
             </ul>
           </div>
         </div>
@@ -35,7 +35,7 @@
               <!-- v-if="$index==0 || (task.date != submenu.tasks[$index-1].date)" -->
               <p v-if="getRenderedLen">{{ date }}</p>
               <ul>
-                <li :class="{done: task.done}" @click="getTask(task, $index)" v-for=" task in tasks" v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)">{{ task.title }}</li>
+                <li :class="{done: task.done}" @click="getTask($event, task, $index)" v-for=" task in tasks" v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)">{{ task.title }}</li>
               </ul>
             </div>
   
@@ -62,7 +62,7 @@
           </div>
         </div>
         <div class="header date bo-b">日期:
-          <input type="text" ref="date" :value="isEditCmd ? showedTask.date : ''">
+          &nbsp;&nbsp;<span ref="date" v-text="isEditCmd ? showedTask.date : ''"></span>
         </div>
         <div class="text-cont bo-b">
           <span>正文:</span>
@@ -108,7 +108,9 @@ export default {
     }
   },
   methods: {
-    getTask(task, index) {
+    getTask(ev, task, index) {
+      var elem = ev.currentTarget
+      this.taskChosenStyHandler(elem)
       if (this.showEditor) {
         return false
       }
@@ -260,6 +262,12 @@ export default {
       var cls = elem.classList[0]
       $('.l-side0').find('.'+cls).removeClass('on')
       $(elem).addClass('on')
+    },
+    taskChosenStyHandler(elem){
+      $('.cont-inner').find('li').removeClass('on')
+      $(elem).addClass('on')
+      // $('.l-side0').find('.'+cls).removeClass('on')
+      // $(elem).addClass('on')
     },
     getFormattedDate() {
       var date = new Date();
@@ -417,9 +425,12 @@ export default {
             background #fff
             border 1px solid #D5D5D5
       .cont-wra
-        background #fff
-        
-        
+        background $bac
+        .cont-inner
+          li.on
+            background #fff
+            
+
     .content
       flex 1
       min-width 500px
@@ -476,6 +487,8 @@ export default {
       background $bac
       border-bottom 0
       cursor pointer
+  ._menu.on
+    background #fff!important
   .cont-wra
     padding-top 10px
   .footer
