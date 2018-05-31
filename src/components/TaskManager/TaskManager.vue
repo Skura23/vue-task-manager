@@ -47,9 +47,9 @@
         <div class="header title bo-b">
           <div>标题: {{showedTask.title}}</div>
           <div class="operate">
-            <span @click="showedTask.done = true" class="_mark" :style="{ visibility: showedTask.done ? 'hidden':'visible'}">标记完成</span>
+            <span @click="showedTask.done = true" class="_mark" >标记完成</span>
             <span @click="modiTask('edit')">编辑</span>
-            <span>删除</span>
+            <!-- <span>删除</span> -->
           </div>
         </div>
         <div class="header date bo-b" v-show="taskChosen">日期: {{getFormattedDate(showedTask.date, false)}}</div>
@@ -157,13 +157,13 @@ export default {
       task.date = Math.floor(+new Date()/1000);
       // task.date = this.$refs.date.value.trim();
       task.content = this.$refs.content.value.trim();
-      task.done = false;
       // console.log(task)
       if (this.isEditCmd) {
         // this.taskIndex
-        this.tasks[this.taskIndex] = task;
+        this.tasks[this.taskIndex] = {...this.tasks[this.taskIndex], ...task};
         this.showedTask = task;
       } else {
+        task.done = false;
         this.tasks.push(task)
       }
       this.showEditor = false;
