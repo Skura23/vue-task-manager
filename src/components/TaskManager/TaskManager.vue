@@ -30,14 +30,14 @@
                           即使任务为空日期栏仍会显示, 印象用户体验 -->
   
             <!-- v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)" -->
-            <div class="day-wra" v-for="(tasks, date, $index) in sortedTasks">
+            <!-- <div class="day-wra" v-for="(tasks, date, $index) in sortedTasks"> -->
               <!-- 很关键, 这句话控制重复日期栏不显示 -->
               <!-- v-if="$index==0 || (task.date != submenu.tasks[$index-1].date)" -->
-              <p v-if="getRenderedLen">{{ date }}</p>
-              <ul>
-                <li :class="{done: task.done}" @click="getTask($event, task, $index)" v-for=" task in tasks" v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)">{{ task.title }}</li>
+              <!-- <p v-if="getRenderedLen">{{ date }}</p> -->
+              <ul class="day-wra">
+                <li :class="{done: task.done}" @click="getTask($event, task, $index)" v-for=" (task, $index) in tasks" v-if="doneType=='all' ? true : (doneType=='done' ? task.done : !task.done)">{{ task.title }}</li>
               </ul>
-            </div>
+            <!-- </div> -->
   
           </div>
         </div>
@@ -47,12 +47,12 @@
         <div class="header title bo-b">
           <div>标题: {{showedTask.title}}</div>
           <div class="operate">
-            <span @click="showedTask.done = true">标记完成</span>
+            <span @click="showedTask.done = true" class="_mark" :style="{ visibility: showedTask.done ? 'hidden':'visible'}">标记完成</span>
             <span @click="modiTask('edit')">编辑</span>
             <span>删除</span>
           </div>
         </div>
-        <div class="header date bo-b">日期: {{showedTask.date}}</div>
+        <div class="header date bo-b" v-show="taskChosen">日期: {{getFormattedDate(showedTask.date, false)}}</div>
         <div class="text-cont">{{showedTask.content}}</div>
       </div>
       <div class="content" v-show="showEditor" :class="{editor:showEditor}">
@@ -154,8 +154,7 @@ export default {
       var task = {};
       // alert()
       task.title = this.$refs.title.value.trim();
-      task.time = Date.now();
-      task.date = this.getFormattedDate()
+      task.date = Math.floor(+new Date()/1000);
       // task.date = this.$refs.date.value.trim();
       task.content = this.$refs.content.value.trim();
       task.done = false;
@@ -269,8 +268,9 @@ export default {
       // $('.l-side0').find('.'+cls).removeClass('on')
       // $(elem).addClass('on')
     },
-    getFormattedDate() {
-      var date = new Date();
+    // timestamp to 2018-05-26 14:22:05
+    getFormattedDate(value, onlydate) {
+      var date = new Date(value*1000);
       var month = date.getMonth() + 1;
       var day = date.getDate();
       var hour = date.getHours();
@@ -281,7 +281,10 @@ export default {
       hour = (hour < 10 ? '0' : '') + hour;
       min = (min < 10 ? '0' : '') + min;
       sec = (sec < 10 ? '0' : '') + sec;
-      var str = date.getFullYear() + '-' + month + '-' + day + '_' + hour + ':' + min + ':' + sec;
+      var str = date.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec;
+      if (onlydate) {
+        str = date.getFullYear() + '-' + month + '-' + day
+      }
       /* alert(str); */
       // 格式: 2018-05-26_14:22:05
       return str;
@@ -350,6 +353,25 @@ export default {
       return zeroLen
     }
   },
+  // filters:{
+  //   timeFormat(value, onlydate){
+  //     var date = new Date();
+  //     var month = date.getMonth() + 1;
+  //     var day = date.getDate();
+  //     var hour = date.getHours();
+  //     var min = date.getMinutes();
+  //     var sec = date.getSeconds();
+  //     month = (month < 10 ? '0' : '') + month;
+  //     day = (day < 10 ? '0' : '') + day;
+  //     hour = (hour < 10 ? '0' : '') + hour;
+  //     min = (min < 10 ? '0' : '') + min;
+  //     sec = (sec < 10 ? '0' : '') + sec;
+  //     var str = date.getFullYear() + '-' + month + '-' + day + '' + hour + ':' + min + ':' + sec;
+  //     /* alert(str); */
+  //     // 格式: 2018-05-26 14:22:05
+  //     return str;
+  //   }
+  // },
   created() {
     axios.get('static/data.json').then((res) => {
       // this.tasks = res.data.tasks
@@ -528,4 +550,5 @@ export default {
 .done
   color #20c120
   font-weight bold
+
 </style>
